@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>BOM — Óculos Inteligentes v9.4.1</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f7f4;--surface:#ffffff;--border:#e2e0d8;--border2:#c8c5bb;--text:#1a1916;--muted:#6b6860;--accent:#1d4ed8;--green:#15803d;--amber:#b45309;--red:#b91c1c;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#0f0f0d;--surface:#1a1916;--border:#2a2824;--border2:#3a3830;--text:#e8e6e0;--muted:#8a8880;--accent:#60a5fa;--green:#4ade80;--amber:#fbbf24;--red:#f87171}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;padding:24px 28px}
+h1{font-size:18px;font-weight:500;margin-bottom:4px}
+.sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+/* controls */
+.controls{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.controls input{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:6px 12px;font-family:var(--sans);font-size:12px;color:var(--text);width:220px;outline:none}
+.controls input:focus{border-color:var(--accent)}
+.controls select{background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;font-family:var(--sans);font-size:12px;color:var(--text);outline:none;cursor:pointer}
+/* totals */
+.totals{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.tbox{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:120px}
+.tbox .n{font-size:20px;font-weight:500;font-family:var(--mono);color:var(--accent)}
+.tbox .l{font-size:11px;color:var(--muted);margin-top:2px}
+/* table */
+.wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--surface);padding:9px 12px;text-align:left;font-weight:500;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border2);white-space:nowrap}
+thead th.num{text-align:right}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface)}
+td{padding:8px 12px;vertical-align:top}
+td.cat{font-size:10px;white-space:nowrap}
+td.part{font-family:var(--mono);font-size:11px;font-weight:500}
+td.maker{font-size:11px;color:var(--muted)}
+td.desc{font-size:11px;color:var(--muted);max-width:300px}
+td.ref{font-family:var(--mono);font-size:10px;color:var(--muted)}
+td.qty{text-align:right;font-family:var(--mono);font-size:12px;font-weight:500}
+td.price{text-align:right;font-family:var(--mono);font-size:11px}
+td.total{text-align:right;font-family:var(--mono);font-size:11px;font-weight:500}
+td.src{font-size:10px;color:var(--accent)}
+.badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:500;white-space:nowrap}
+.b-mcu{background:#dbeafe;color:#1e40af}.b-cam{background:#fce7f3;color:#9d174d}
+.b-sen{background:#d1fae5;color:#065f46}.b-imu{background:#ede9fe;color:#5b21b6}
+.b-aud{background:#fef3c7;color:#92400e}.b-hap{background:#fee2e2;color:#991b1b}
+.b-pwr{background:#e0f2fe;color:#0369a1}.b-pro{background:#f3f4f6;color:#374151}
+.b-led{background:#fef9c3;color:#713f12}.b-con{background:#f0fdf4;color:#166534}
+.b-fpc{background:#fff7ed;color:#9a3412}.b-fet{background:#f5f3ff;color:#4c1d95}
+.b-res{background:#fafaf9;color:#57534e}.b-cap{background:#ecfdf5;color:#064e3b}
+.b-ind{background:#fdf2f8;color:#701a75}.b-pcb{background:#eff6ff;color:#1d4ed8}
+.b-mec{background:#f7f7f5;color:#292524}
+@media(prefers-color-scheme:dark){
+.b-mcu{background:#1e3a8a;color:#bfdbfe}.b-cam{background:#831843;color:#fbcfe8}
+.b-sen{background:#064e3b;color:#a7f3d0}.b-imu{background:#4c1d95;color:#ddd6fe}
+.b-aud{background:#78350f;color:#fde68a}.b-hap{background:#7f1d1d;color:#fca5a5}
+.b-pwr{background:#0c4a6e;color:#bae6fd}.b-pro{background:#1f2937;color:#d1d5db}
+.b-led{background:#713f12;color:#fef08a}.b-con{background:#14532d;color:#bbf7d0}
+.b-fpc{background:#7c2d12;color:#fed7aa}.b-fet{background:#2e1065;color:#ddd6fe}
+.b-res{background:#1c1917;color:#d6d3d1}.b-cap{background:#022c22;color:#6ee7b7}
+.b-ind{background:#4a044e;color:#f0abfc}.b-pcb{background:#1e3a8a;color:#bfdbfe}
+.b-mec{background:#1c1917;color:#d6d3d1}}
+.sep{background:var(--bg);border-top:2px solid var(--border2)}
+.sep td{padding:4px 12px;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+tr.hidden{display:none}
+</style>
+</head>
+<body>
+
+<h1>BOM — Óculos Inteligentes v9.4.1</h1>
+<div class="sub">Lista completa de materiais para 1 par de óculos · v9.4.1 com fixes P1–P6 aplicados</div>
+
+<div class="controls">
+  <input id="search" type="text" placeholder="Pesquisar componente..." oninput="filter()">
+  <select id="catFilter" onchange="filter()">
+    <option value="">Todas as categorias</option>
+  </select>
+  <span style="font-size:11px;color:var(--muted)" id="count-info"></span>
+</div>
+
+<div class="totals">
+  <div class="tbox"><div class="n" id="t-lines">—</div><div class="l">linhas BOM</div></div>
+  <div class="tbox"><div class="n" id="t-parts">—</div><div class="l">peças totais</div></div>
+  <div class="tbox"><div class="n" id="t-cost">—</div><div class="l">custo est. / par</div></div>
+  <div class="tbox"><div class="n" id="t-pcb">€52</div><div class="l">só PCBs (5 placas)</div></div>
+</div>
+
+<div class="wrap">
+<table id="bom-table">
+<thead>
+<tr>
+  <th>Cat.</th>
+  <th>Componente</th>
+  <th>Fabricante</th>
+  <th>Descrição</th>
+  <th>Ref. PCB</th>
+  <th class="num">Qtd.</th>
+  <th class="num">€/un</th>
+  <th class="num">Total</th>
+  <th>Fonte</th>
+</tr>
+</thead>
+<tbody id="bom-body"></tbody>
+</table>
+</div>
+
+<script>
+const BOM = [
+  ["MCU","ESP32-S3-PICO-1-N8R8","Espressif","Módulo 13.2×8.6mm, WiFi/BT, 8MB Flash+PSRAM, 34 pads castellation",2,"U1",5.50,"LCSC: C5369010"],
+  ["CÂMARA","OV5640 módulo","OmniVision","5MP DVP, módulo c/ lente M12 fixa, FPC 24p",2,"U_CAM",6.00,"AliExpress"],
+  ["SENSOR","VL53L4CD","ST","ToF laser I2C, 200cm, LGA-12 2.4×2.4mm",2,"U_TOF",3.20,"LCSC: C529261"],
+  ["SENSOR","TMF8821","AMS","ToF 8×8 zonas I2C, LGA-28, placa FC central",1,"U_TMF",8.50,"Mouser"],
+  ["SENSOR","APDS-9960","Broadcom","Proximidade + gesto + luz RGB, I2C, LGA-6",2,"U_APDS",2.80,"LCSC: C82506"],
+  ["IMU","ICM-20948","InvenSense","9-DOF accel+gyro+mag, I2C, QFN-24 3×3mm (SLAVE)",1,"U8_icm",4.50,"LCSC: C322157"],
+  ["ÁUDIO","MAX98357A","Maxim","Amp I2S classe D 3W, WLCSP 9p 0.5mm, face bottom",2,"U7_max",1.80,"LCSC: C2681588"],
+  ["ÁUDIO","Altifalante 8Ω 0.5W","Generic","SMD 12×12mm, 1–4kHz",2,"SPK1",1.20,"AliExpress"],
+  ["ÁUDIO","INMP441 microfone","InvenSense","MEMS I2S digital, LGA-6 4×3mm, 65dB SNR",2,"U_MIC",2.00,"LCSC: C92434"],
+  ["HAPTIC","DRV2605L","TI","Driver LRA/ERM haptic I2C, WSON-10 3×3mm",2,"U8_drv",2.50,"LCSC: C99504"],
+  ["HAPTIC","Motor LRA 8mm","Jinlong","Linear Resonance Actuator 8×8×3mm, 2V ~175Hz",2,"M1",3.50,"Mouser: 485-1573"],
+  ["POWER","BQ25185","TI","Carregador LiPo USB-C I2C, WLCSP 9p 0.5mm, face bottom",2,"U2_bq",2.20,"LCSC: C2680588"],
+  ["POWER","Bateria 18650 2600mAh","Samsung SDI","Li-Ion 3.7V, 18×65mm, com PCM protecção",2,"BAT1",5.00,"Loja local"],
+  ["POWER","Suporte bateria 18650","Keystone","THT ou fio, lateral à haste",2,"BAT_HDR",0.80,"LCSC"],
+  ["POWER","MP1584 buck 3A","MPS","SOIC-8, 4.5–28V in, saída ajustável",2,"U5_buck",0.60,"LCSC: C17551"],
+  ["POWER","XC6206P332 LDO","Torex","3.3V 200mA, SOT-23-5, face bottom",2,"U6_ldo",0.25,"LCSC: C5446"],
+  ["PROTECÇÃO","DW01A","Various","Protecção bateria overcurrent/overdischarge, SOT-26",2,"U3_dw",0.15,"LCSC: C82751"],
+  ["PROTECÇÃO","FS8205A","Various","Dual N-FET protecção bateria, SOT-26",2,"U4_fs",0.20,"LCSC: C32254"],
+  ["PROTECÇÃO","USBLC6-2SC6","ST","TVS USB D+/D-, SOT-363 (só MASTER)",1,"U_TVS_USB",0.35,"LCSC: C7519"],
+  ["PROTECÇÃO","PRTR5V0U2X","NXP","TVS sinal UART 5V, SOT-363",2,"U_TVS_SIG",0.40,"LCSC: C12333"],
+  ["PROTECÇÃO","PTC 500mA 1812","Bourns","MF-MSMF050, VBUS resetável",2,"F1",0.20,"LCSC"],
+  ["PROTECÇÃO","PTC 1A 1812","Bourns","MF-MSMF110, VBAT resetável",2,"F2",0.25,"LCSC"],
+  ["LED","WS2812B","WorldSemi","RGB endereçável 5×5mm SMD",2,"LED1",0.30,"LCSC: C2761"],
+  ["CONECTOR","USB-C 16p SMD","HRO","Receptáculo duplos pinos, 9×3.4mm (só MASTER)",1,"J_USB",0.80,"LCSC: C165948"],
+  ["CONECTOR","FPC 24p 0.5mm horiz.","Amphenol","TL actuator, haste→câmara FL/FR",2,"J_FL",0.90,"LCSC: C262659"],
+  ["CONECTOR","FPC 8p 1.0mm horiz.","Amphenol","TL actuator, haste→câmara central FC",2,"J_FC",0.60,"LCSC"],
+  ["CONECTOR","JST-PH 8p 2mm","JST","Inter-board L↔R",2,"J_INTER",0.50,"LCSC: C157929"],
+  ["CONECTOR","JST-PH 2p 2mm","JST","Bateria",2,"BAT_CON",0.25,"LCSC: C225875"],
+  ["FPC CABO","Cabo FPC 24p 0.5mm 60mm","Generic","Câmara FL → haste L",1,"FPC_FL",1.50,"AliExpress"],
+  ["FPC CABO","Cabo FPC 24p 0.5mm 60mm","Generic","Câmara FR → haste R",1,"FPC_FR",1.50,"AliExpress"],
+  ["FPC CABO","Cabo FPC 8p 1.0mm 50mm","Generic","Câmara FC → haste L",1,"FPC_FC",1.20,"AliExpress"],
+  ["FET","SI2333DS P-FET","Vishay","Load switch power circuit, SOT-23",2,"Q1",0.30,"LCSC: C10440"],
+  ["FET","IRLML2502 N-FET","IR","Latch power circuit, SOT-23",2,"Q2",0.25,"LCSC: C8545"],
+  ["RESISTÊNCIA","100kΩ 0402","Yageo","Pull-up/pull-down power ×8",8,"R_100k",0.01,"LCSC: C25741"],
+  ["RESISTÊNCIA","10kΩ 0402","Yageo","I2C pull-ups, misc ×20",20,"R_10k",0.01,"LCSC: C25744"],
+  ["RESISTÊNCIA","5.1kΩ 0402","Yageo","USB-C CC1/CC2 ×4",4,"R_CC",0.01,"LCSC: C23186"],
+  ["RESISTÊNCIA","470kΩ 0402","Yageo","RC force-off ×2",2,"R5_rc",0.01,"LCSC: C25764"],
+  ["RESISTÊNCIA","0Ω 0402","Yageo","R_match antena (jumper) ×2",2,"R_match",0.01,"LCSC"],
+  ["CONDENSADOR","10µF 0805 X5R 10V","Murata","Bulk decoupling C_DIG/SEN/ACT/pwr/PICO ×12",12,"C_10u",0.05,"LCSC: C15850"],
+  ["CONDENSADOR","4.7µF 0805 X5R","Murata","C_AUD ×4",4,"C_4u7",0.04,"LCSC: C15849"],
+  ["CONDENSADOR","100nF 0402 X7R 16V","Yageo","HF decoupling C_100n/WS/3v3 ×12",12,"C_100n",0.01,"LCSC: C14663"],
+  ["CONDENSADOR","10µF 1206 electrolítico","Nichicon","C_bi/C_bo buck caps ×4",4,"C_bi",0.08,"LCSC"],
+  ["CONDENSADOR","1pF 0402 NP0","Yageo","C_tune antena ×2",2,"C_tune",0.02,"LCSC"],
+  ["INDUTOR","4.7µH 0806 1A","Murata","L1 buck converter ×2",2,"L1",0.30,"LCSC: C1046"],
+  ["PCB","PCB-L haste MASTER","JLCPCB","FR-4 1.6mm 2L ENIG double-sided, 110×12mm tapered",1,"PCB-L",18.00,"jlcpcb.com"],
+  ["PCB","PCB-R haste SLAVE","JLCPCB","FR-4 1.6mm 2L ENIG double-sided, 110×12mm tapered",1,"PCB-R",18.00,"jlcpcb.com"],
+  ["PCB","PCB-FL câmara esq.","JLCPCB","FR-4 1.0mm 2L ENIG, 38×15mm",1,"PCB-FL",6.00,"jlcpcb.com"],
+  ["PCB","PCB-FC câmara central","JLCPCB","FR-4 1.0mm 2L ENIG, 22×13mm",1,"PCB-FC",4.00,"jlcpcb.com"],
+  ["PCB","PCB-FR câmara dir.","JLCPCB","FR-4 1.0mm 2L ENIG, 38×15mm",1,"PCB-FR",6.00,"jlcpcb.com"],
+  ["MECÂNICA","Armação TR-90 nylon","Generic","140mm frontal, hastes 110mm, sem lentes",1,"FRAME",12.00,"AliExpress"],
+  ["MECÂNICA","Lente PC transparente","Generic","Policarbonato óptico 50×35mm ×2",2,"LENS",3.00,"AliExpress"],
+  ["MECÂNICA","Guia FPC TPU ×4","Print 3D","Impressão 3D TPU, guia curva cabo FPC",4,"GUIDE",0.50,"Próprio"],
+  ["MECÂNICA","Cabo JST-PH inter-board","Generic","8p macho-macho 100mm",1,"CBL_IB",1.50,"AliExpress"],
+];
+
+const CAT_BADGE = {
+  "MCU":"b-mcu","CÂMARA":"b-cam","SENSOR":"b-sen","IMU":"b-imu",
+  "ÁUDIO":"b-aud","HAPTIC":"b-hap","POWER":"b-pwr","PROTECÇÃO":"b-pro",
+  "LED":"b-led","CONECTOR":"b-con","FPC CABO":"b-fpc","FET":"b-fet",
+  "RESISTÊNCIA":"b-res","CONDENSADOR":"b-cap","INDUTOR":"b-ind",
+  "PCB":"b-pcb","MECÂNICA":"b-mec",
+};
+
+let visible = [...BOM];
+
+function render(){
+  const tbody = document.getElementById('bom-body');
+  let html='', lastCat='', lines=0, parts=0, cost=0;
+  visible.forEach(r=>{
+    const [cat,name,maker,desc,qty,ref,price,src]=r;
+    if(cat!==lastCat){
+      html+=`<tr class="sep"><td colspan="9">${cat}</td></tr>`;
+      lastCat=cat;
+    }
+    const tot=(qty*price).toFixed(2);
+    const badge=CAT_BADGE[cat]||'b-res';
+    html+=`<tr>
+      <td class="cat"><span class="badge ${badge}">${cat}</span></td>
+      <td class="part">${name}</td>
+      <td class="maker">${maker}</td>
+      <td class="desc">${desc}</td>
+      <td class="ref">${ref}</td>
+      <td class="qty">${qty}</td>
+      <td class="price">€${price.toFixed(2)}</td>
+      <td class="total">€${tot}</td>
+      <td class="src">${src}</td>
+    </tr>`;
+    lines++; parts+=qty; cost+=qty*price;
+  });
+  tbody.innerHTML=html;
+  document.getElementById('t-lines').textContent=lines;
+  document.getElementById('t-parts').textContent=parts;
+  document.getElementById('t-cost').textContent='€'+cost.toFixed(2);
+  document.getElementById('count-info').textContent=`${lines} de ${BOM.length} linhas`;
+}
+
+function filter(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const cat=document.getElementById('catFilter').value;
+  visible=BOM.filter(r=>{
+    const match=!q||(r[0]+r[1]+r[2]+r[3]+r[5]).toLowerCase().includes(q);
+    const catMatch=!cat||r[0]===cat;
+    return match&&catMatch;
+  });
+  render();
+}
+
+// Populate categories
+(()=>{
+  const cats=[...new Set(BOM.map(r=>r[0]))];
+  const sel=document.getElementById('catFilter');
+  cats.forEach(c=>{
+    const o=document.createElement('option');
+    o.value=c; o.textContent=c;
+    sel.appendChild(o);
+  });
+})();
+
+render();
+</script>
+</body>
+</html>
